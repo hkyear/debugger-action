@@ -36,16 +36,12 @@ if [[ ! -z "$SLACK_WEBHOOK_URL" ]]; then
   curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"\`$MSG\`\"}" $SLACK_WEBHOOK_URL
 fi
 
-# Wait for connection to close or timeout in 15 min
-timeout=$((15*60))
-while [ -S /tmp/tmate.sock ]; do
-  sleep 1
-  timeout=$(($timeout-1))
+# 退出
 
-  if [ ! -f /tmp/keepalive ]; then
-    if (( timeout < 0 )); then
-      echo Waiting on tmate connection timed out!
-      exit 1
-    fi
-  fi
-done
+while [ -S /tmp/tmate.sock ]; do
+  sleep 10
+  if [ -f /tmp/down ]; then
+      echo "tmate connection over!"
+      exit 0
+  fi  
+done  
